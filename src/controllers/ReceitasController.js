@@ -8,16 +8,12 @@ class ReceitasController {
   async store(req, res) {
 
     try{
-     /* const novaReceita = await Receitas.create(req.body);
-      return res.json(novaReceita);*/
-      const { nome, modoPreparo, ingredientes, usuarioId } = req.body;
 
-      //const carboidratoTotal = await this.calcularCarboidratoTotal(ingredientes);
+      const { nome, modoPreparo, ingredientes, usuarioId } = req.body;
 
       const novaReceita = await Receitas.create({
         nome,
         modoPreparo,
-//carboidrato : carboidratoTotal,
         usuarioId
       });
 
@@ -81,7 +77,21 @@ class ReceitasController {
       return res.json(receitas);
 
     } catch (e) {
-      return res.status(500).json('Erro ao buscar receitas');
+      console.log(e);
+      if (e.errors) {
+        console.log(e.errors);
+        console.error(e)
+        return res.status(400).json({
+          errors: e.errors.map((err) => err.message),
+        });
+      }  else {
+        console.log(e.errors);
+        console.error(e)
+        return res.status(500).json({
+          errors: ['Erro ao buscar receitas.'],
+        });
+      }
+      //return res.status(500).json('Erro ao buscar receitas');
     }
   }
 

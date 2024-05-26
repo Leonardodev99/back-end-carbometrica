@@ -1,4 +1,5 @@
 import Ingredientes from "../models/Ingredientes";
+import Receitas from "../models/Receitas";
 
 class IngredientesController {
 
@@ -43,6 +44,7 @@ class IngredientesController {
       return res.json(ingredientes);
 
     } catch (e) {
+      console.log(e);
       return res.json(null);
 
     }
