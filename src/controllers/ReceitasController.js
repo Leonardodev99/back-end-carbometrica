@@ -145,6 +145,38 @@ class ReceitasController {
     }
 
   }
+  async quantidadeSegura(req, res) {
+
+    try {
+      const { id } = req.params;
+      if(!id) {
+        return res.status(404).json({
+          errors: ['ID nao encontrado!'],
+        })
+      }
+      const receita = await Receitas.findByPk(id);
+      if(!receita) {
+        return res.status(404).json({
+          errors: ['Receita nao encontrada!'],
+        })
+      }
+      const { nivelGlicose, sensibilidadeInsulina } = req.body;
+      const { limiteGlicose } = 180; // Valor fictício em mg/dL
+      const { carboidratoDaReceita } = await Receitas.findOne({
+        where: { id },
+        attributes: ['carboidrato']
+      });
+      const doseInsulina = sensibilidadeInsulina * (nivelGlicose - limiteGlicose);
+      const quantidadeSegura = doseInsulina / carboidratoDaReceita.carboidrato;
+      return  res.status(201).json({ message: 'Para nao passar mal deves comer!',
+       quantidadeSegura, message: '/g' });
+
+    } catch(e) {
+      return res.status(400).json({
+        error: e.errors.map((err) => err.message),
+      });
+    }
+  }
 
   async delete(req, res) {
     try {
