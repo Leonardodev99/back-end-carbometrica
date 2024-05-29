@@ -10,6 +10,7 @@ router.get('/', receitasController.index);
 router.get('/:id', receitasController.show);
 router.put('/:id',  receitasController.update);
 router.delete('/:id', receitasController.delete);
+router.post('/quantidadeSegura',  receitasController.store);
 
 export default router;
 
