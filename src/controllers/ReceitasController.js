@@ -166,19 +166,30 @@ class ReceitasController {
         where: { id },
         attributes: ['carboidrato']
       });
+
+
       const doseInsulina = sensibilidadeInsulina * (nivelGlicose - limiteGlicose);
+      console.log(carboidratoDaReceita);
       const quantidadeSegura = doseInsulina / carboidratoDaReceita.carboidrato;
       return  res.status(201).json({ message: 'Para nao passar mal deves comer!',
        quantidadeSegura, message: '/g' });
 
     } catch(e) {
-      return res.status(400).json({
-        error: e.errors.map((err) => err.message),
-      });
+      console.log(e);
+      if (e.errors) {
+        return res.status(400).json({
+          error: e.errors.map((err) => err.message),
+        });
+      } else {
+        // Caso não tenha a propriedade `errors`, mande uma mensagem genérica:
+        return res.status(400).json({
+          error: 'Ocorreu um erro ao calcular a quantidade segura.'
+        });
+      }
     }
   }
 
-  async delete(req, res) {
+ /* async delete(req, res) {
     try {
       const { id } = req.params;
       if(!id) {
@@ -202,7 +213,7 @@ class ReceitasController {
       });
     }
 
-  }
+  }*/
 }
 
 export default new ReceitasController();
