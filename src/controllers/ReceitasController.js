@@ -27,7 +27,7 @@ class ReceitasController {
             });
           }
 
-          //const carboidratoTotal = await this.calcularCarboidratoTotal(novaReceita.id);
+
           const carboidratoTotal = await ReceitasController.calcularCarboidratoTotal(novaReceita.id);
 
           // Atualize a receita com o carboidrato total
@@ -91,7 +91,7 @@ class ReceitasController {
           errors: ['Erro ao buscar receitas.'],
         });
       }
-      //return res.status(500).json('Erro ao buscar receitas');
+
     }
   }
 
@@ -123,28 +123,40 @@ class ReceitasController {
   async update(req, res) {
     try {
       const { id } = req.params;
-      if(!id) {
+      if (!id) {
         return res.status(400).json({
           errors: ['Faltando ID'],
         });
       }
       const receita = await Receitas.findByPk(id);
-      if(!receita) {
+      if (!receita) {
         return res.status(404).json({
           errors: ['Receita inexistente!'],
         });
       }
 
-      const receitaAtualizada = await Receitas.update(req.body);
-      return res.json(receitaAtualizada);
+      // Atualize a receita com os novos dados
+      await receita.update(req.body);
 
+      return res.json(receita);
     } catch (e) {
-      return res.status(400).json({
-        errors: e.errors.map((err) => err.message),
-      });
+      console.log(e);
+      if (e.errors) {
+        console.log(e.errors);
+        console.error(e);
+        return res.status(400).json({
+          errors: e.errors.map((err) => err.message),
+        });
+      } else {
+        console.log(e.errors);
+        console.error(e);
+        return res.status(500).json({
+          errors: ['Erro ao atualizar a receita.'],
+        });
+      }
     }
-
   }
+
   async quantidadeSegura(req, res) {
 
     try {
@@ -189,31 +201,7 @@ class ReceitasController {
     }
   }
 
- /* async delete(req, res) {
-    try {
-      const { id } = req.params;
-      if(!id) {
-        return res.status(400).json({
-          errors: ['Faltando ID'],
-        });
-      }
-      const receita = await Receitas.findByPk(id);
-      if(!receita) {
-        return res.status(400).json({
-          errors: ['Receita inexistente!'],
-        });
-      }
 
-      await receita.destroy();
-      return res.json('Receita deletada com sucesso!');
-
-    } catch (e) {
-      return res.status(400).json({
-        errors: e.errors.map((err) => err.message),
-      });
-    }
-
-  }*/
 }
 
 export default new ReceitasController();

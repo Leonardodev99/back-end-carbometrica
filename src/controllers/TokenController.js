@@ -36,32 +36,7 @@ class TokenController {
     return res.json({ token });
 
   }
-  //Gerando o token para a recuperacao de senha
-  async forgotPassword(req, res) {
-    const { email } = res.body;
 
-    try {
-
-      //verificar se o usuario com o e-mail fornecido existe
-      const usuario = await Usuario.findOne({ where: { email }});
-
-      if(!usuario) {
-        return res.status(404).json({ Message: 'Usuario nao encontrado '});
-      }
-
-      //Gerar o token de reuperacao de senha
-      const resetToken = jwt.sign({ id: usuario.id }, process.env.RESET_TOKEN_SECRET, {
-        expiresIn: '1h',
-      });
-
-      //Enviar e-mail com link de redifinicao de senha
-      //Codigo para enviar e-mail aqui..
-
-      return res.json({ message: 'E-mail de recuperacao de senha enviado com sucesso' });
-    }catch (error) {
-      return res.status(500).json({ massage: 'Ocorreu um erro ao processar a solicitacao' });
-    }
-  }
 
 }
 
