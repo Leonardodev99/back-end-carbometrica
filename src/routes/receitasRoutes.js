@@ -10,7 +10,7 @@ router.get('/', receitasController.index);
 router.get('/:id', loginRequired, receitasController.show);
 router.put('/:id', loginRequired, receitasController.update);
 //router.delete('/:id', receitasController.delete);
-router.post('/:id/segura',  receitasController.quantidadeSegura);
+router.post('/:id/segura',  loginRequired, receitasController.quantidadeSegura);
 
 export default router;
 
