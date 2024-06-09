@@ -166,25 +166,36 @@ class ReceitasController {
           errors: ['ID nao encontrado!'],
         })
       }
-      const receita = await Receitas.findByPk(id);
+      const receita = await Receitas.findByPk(id, {
+        attributes: ['carboidrato'],
+      });
+
       if(!receita) {
         return res.status(404).json({
           errors: ['Receita nao encontrada!'],
         })
       }
+
       const { nivelGlicose, sensibilidadeInsulina } = req.body;
-      const { limiteGlicose } = 180; // Valor fictício em mg/dL
-      const { carboidratoDaReceita } = await Receitas.findOne({
-        where: { id },
-        attributes: ['carboidrato']
-      });
+      const limiteGlicose  = 180; // Valor fictício em mg/dL
+
+      const carboidratoDaReceita = receita.carboidrato;
+      if(carboidratoDaReceita === undefined) {
+        return res.status(404).json({
+          errors: ['A receita não possui informação de carboidrato.'],
+        })
+      }
 
 
-      const doseInsulina = sensibilidadeInsulina * (nivelGlicose - limiteGlicose);
-      console.log(carboidratoDaReceita);
-      const quantidadeSegura = doseInsulina / carboidratoDaReceita.carboidrato;
-      return  res.status(201).json({ message: 'Para nao passar mal deves comer!',
-       quantidadeSegura, message: '/g' });
+      const doseInsulina =  (nivelGlicose - limiteGlicose)/sensibilidadeInsulina;
+
+      const doseInsulinaAjustada = Math.max(doseInsulina, 0);
+
+      const quantidadeSegura = carboidratoDaReceita > 0 ? doseInsulinaAjustada / carboidratoDaReceita : 0;
+
+      return  res.status(201).json({
+        message: 'Para nao passar mal deves comer!',
+        quantidadeSegura: quantidadeSegura, });
 
     } catch(e) {
       console.log(e);
