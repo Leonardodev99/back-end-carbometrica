@@ -73,7 +73,9 @@ class ReceitasController {
 
   async index(req, res) {
     try {
-      const receitas = await Receitas.findAll();
+      const receitas = await Receitas.findAll({
+        attributes: ['nome', 'carboidrato'],
+      });
       return res.json(receitas);
 
     } catch (e) {
@@ -98,13 +100,16 @@ class ReceitasController {
   async show(req, res) {
 
     try {
-      const { id } = req.params;
-      if(!id) {
+      const { nome } = req.params;
+      if(!nome) {
         return res.status(400).json({
-          errors: ['Faltando ID'],
+          errors: ['Faltando o nome da receita'],
         });
       }
-      const receita = await Receitas.findByPk(id);
+      const receita = await Receitas.findOne({
+
+        attributes: ['modoPreparo'],
+      });
       if(!receita) {
         return res.status(404).json({
           errors: ['Receita inexistente!'],

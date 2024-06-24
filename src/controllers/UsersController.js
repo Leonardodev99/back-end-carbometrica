@@ -5,8 +5,8 @@ class UsersController {
   async store(req, res){
     try {
       const novoUsuario = await Usuario.create(req.body);
-      const { id, nome, email, temDiabete, tipoDeDiabete, usaAContagem } = novoUsuario;
-      return res.json({ id, nome, email, temDiabete, tipoDeDiabete, usaAContagem });
+      const { id, nome, email, temDiabete, tipoDeDiabete, usaAContagem,cuidaDiabete } = novoUsuario;
+      return res.json({ id, nome, email, temDiabete, tipoDeDiabete, usaAContagem, cuidaDiabete });
   }catch (e) {
     return res.status(400).json({
       errors: e.errors.map(err => err.message)

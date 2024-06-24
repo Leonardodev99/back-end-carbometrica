@@ -45,11 +45,11 @@ export default class Usuario extends Model {
       ,
       tipoDeDiabete: {
         type: Sequelize.INTEGER,
-        defaultValue: 1,
+        defaultValue: 0,
         validate: {
           isIn: {
-            args: [[1, 2]],
-            msg: 'Campo tipo de diabete deve ser 1 ou 2',
+            args: [[0,1, 2]],
+            msg: 'Campo tipo de diabete deve ser 0, 1 ou 2',
           }
         }
       },
@@ -60,6 +60,16 @@ export default class Usuario extends Model {
           len: {
             args: [3],
             msg: 'Campo usa contagem de carboidrato deve conter 3 caracteres',
+          }
+        }
+      },
+      cuidaDiabete: {
+        type: Sequelize.STRING,
+        defaultValue: '',
+        validate: {
+          len: {
+            args: [3],
+            msg: 'Campo cuida de diabetico deve conter 3 caracteres',
           }
         }
       },
