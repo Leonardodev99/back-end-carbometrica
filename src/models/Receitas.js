@@ -37,12 +37,19 @@ export default class Receitas extends Model {
         },
         usuarioId: {
           type: Sequelize.INTEGER,
-          defaultValue: 0,
+          allowNull: false,
           validate: {
+            notNull: {
+              msg: 'Campo usuarioId é obrigatório',
+            },
             isInt: {
-              msg: 'Campo usuario id prcisa ser um numero inteiro',
-            }
-          }
+              msg: 'Campo usuarioId precisa ser um número inteiro',
+            },
+            min: {
+              args: [1],
+              msg: 'Campo usuarioId deve ser maior que 0',
+            },
+          },
         },
       },
       {
@@ -64,7 +71,7 @@ export default class Receitas extends Model {
   return this;
   }
   static associate(models) {
-    this.hasMany(models.Ingredientes, { foreignKey: 'receitaId' });
+    this.hasMany(models.Ingrediente, { foreignKey: 'receitaId' });
   }
 
 }

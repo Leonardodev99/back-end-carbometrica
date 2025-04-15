@@ -9,7 +9,35 @@ class ReceitasController {
 
     try{
 
-      const { nome, modoPreparo, ingredientes, usuarioId } = req.body;
+      const { nome, modoPreparo, ingredientes } = req.body;
+      const usuarioId = req.usuarioId;
+
+      // Validar usuarioId
+      if (!usuarioId || usuarioId <= 0) {
+        return res.status(401).json({
+          errors: ['Usuário não autenticado ou ID inválido'],
+        });
+      }
+      // Validar ingredientes
+      if (!ingredientes || !Array.isArray(ingredientes) || ingredientes.length === 0) {
+        return res.status(400).json({
+          errors: ['A lista de ingredientes é obrigatória e não pode estar vazia'],
+        });
+      }
+
+      for (const ingrediente of ingredientes) {
+        if (
+          !ingrediente.nome ||
+          !ingrediente.quantidade ||
+          ingrediente.carboidrato === undefined ||
+          isNaN(parseFloat(ingrediente.quantidade)) ||
+          isNaN(parseFloat(ingrediente.carboidrato))
+        ) {
+          return res.status(400).json({
+            errors: ['Todos os ingredientes devem ter nome, quantidade e carboidrato válidos'],
+          });
+        }
+      }
 
       const novaReceita = await Receitas.create({
         nome,
@@ -22,7 +50,7 @@ class ReceitasController {
             await Ingredientes.create({
               nome: ingrediente.nome,
               quantidade: parseFloat(ingrediente.quantidade),
-              carboidratoPorGrama: parseFloat(ingrediente.carboidratoPorGrama),
+              carboidratoPorGrama: parseFloat(ingrediente.carboidrato),
               receitaId: novaReceita.id
             });
           }
@@ -35,23 +63,25 @@ class ReceitasController {
 
 
 
-      return res.json(novaReceita);
+          return res.status(201).json(novaReceita);
 
 
 
     } catch (e) {
-      console.log(e);
-      if (e.errors) {
-        console.error(e)
+      console.error('Erro ao criar receita:', e);
+      if (e.name === 'SequelizeValidationError') {
         return res.status(400).json({
           errors: e.errors.map((err) => err.message),
         });
-      }  else {
-        console.error(e)
-        return res.status(500).json({
-          errors: ['Erro ao criar a receita.'],
+      }
+      if (e.name === 'SequelizeForeignKeyConstraintError') {
+        return res.status(400).json({
+          errors: ['Usuário ou receita associada inválida'],
         });
       }
+      return res.status(500).json({
+        errors: ['Erro ao criar a receita'],
+      });
 
     }
 
@@ -68,7 +98,7 @@ class ReceitasController {
       carboidratoTotal += parseFloat(ingrediente.carboidratoPorGrama)*parseFloat(ingrediente.quantidade);
     }
 
-    return carboidratoTotal;
+    return carboidratoTotal || 0; // Retorna 0 se não houver ingredientes
   }
 
   async index(req, res) {
@@ -123,6 +153,32 @@ class ReceitasController {
       });
     }
 
+  }
+  async minhasReceitas(req, res) {
+    try {
+      // Obter o ID do usuário logado
+      const usuarioId = req.usuarioId;
+
+      // Encontrar as receitas do usuário
+      const receitas = await Receitas.findAll({
+        where: { usuarioId },
+        attributes: ['nome', 'carboidrato'],
+
+      });
+
+      // Se não houver receitas, enviar uma mensagem apropriada
+      if (receitas.length === 0) {
+        return res.status(200).json({ message: 'Você não possui nenhuma receita cadastrada.' });
+      }
+
+      return res.json(receitas);
+
+    } catch (e) {
+      console.error(e);
+      return res.status(500).json({
+        errors: ['Erro ao buscar suas receitas.'],
+      });
+    }
   }
 
   async update(req, res) {

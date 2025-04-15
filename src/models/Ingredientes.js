@@ -15,11 +15,15 @@ export default class Ingredientes extends Model {
         },
         quantidade: {
           type: Sequelize.FLOAT,
-          defaultValue: '',
+          defaultValue: 0,
           validate: {
             isFloat: {
               msg: 'Campo quantidade prcisa ser um numero inteiro ou com ponto flutuante',
-            }
+            },
+            min: {
+              args: [0],
+              msg: 'Campo quantidade não pode ser negativo',
+            },
           }
         },
         carboidratoPorGrama: {
@@ -27,23 +31,34 @@ export default class Ingredientes extends Model {
           defaultValue: 0,
           validate: {
             isFloat: {
-              msg: 'Campo carboidrato prcisa ser um numero inteiro ou com ponto flutuante',
-            }
+              msg: 'Campo carboidrato precisa ser um numero inteiro ou com ponto flutuante',
+            },
+            min: {
+              args: [0],
+              msg: 'Campo carboidrato não pode ser negativo',
+            },
           }
         },
         receitaId: {
           type: Sequelize.INTEGER,
-          defaultValue: 0,
+          allowNull: false, // Torna obrigatório
           validate: {
+            notNull: {
+              msg: 'Campo receitaId é obrigatório',
+            },
             isInt: {
-              msg: 'Campo usuario id prcisa ser um numero inteiro',
-            }
-          }
+              msg: 'Campo receitaId precisa ser um número inteiro',
+            },
+            min: {
+              args: [1],
+              msg: 'Campo receitaId deve ser maior que 0',
+            },
+          },
         },
       },
       {
         sequelize,
-        modelName: 'Ingredientes',
+        modelName: 'Ingrediente',
         tableName: 'ingredientes',
       },
     );

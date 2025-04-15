@@ -40,7 +40,9 @@ class IngredientesController {
 
     try {
 
-      const ingredientes = await Ingredientes.findAll();
+      const ingredientes = await Ingredientes.findAll({
+        attributes: ['nome', 'quantidade','carboidratoPorGrama'],
+      });
       return res.json(ingredientes);
 
     } catch (e) {

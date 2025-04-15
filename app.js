@@ -5,6 +5,8 @@ dotenv.config();
 import './src/database';
 
 import express from 'express';
+import cors from 'cors';
+
 import homeRoutes from './src/routes/homeRoutes';
 import userRoutes from './src/routes/userRoutes ';
 import tokenRoutes from './src/routes/tokenRoutes';
@@ -20,6 +22,12 @@ class App {
   }
 
   middlewares() {
+    const corsOptions = {
+      origin: ['http://localhost:8082'],
+      methods: 'GET,PUT,POST,DELETE',
+      allowedHeaders: ['Content-Type', 'Authorization'],
+    };
+    this.app.use(cors(corsOptions));
     this.app.use(express.urlencoded({ extended: true}));
     this.app.use(express.json());
 
